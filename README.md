@@ -1,8 +1,8 @@
 # Nelua cellular automata
 
-Interactive, generalized [cellular automata](https://en.wikipedia.org/wiki/Cellular_automaton) implementation using nelua and raylib
+Interactive, generalized [cellular automata](https://en.wikipedia.org/wiki/Cellular_automaton) implementation using [nelua](https://nelua.io/overview/) and [raylib](https://www.raylib.com/)
 
-[Play it!](), It works in the browser!
+[Play it!](https://lucastavaresa.github.io/nelua-cellular-automata/dist/index.html), It works in the browser!
 
 ## Game of Life
 

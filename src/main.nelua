@@ -1,7 +1,27 @@
+-- nelua
+require 'allocators.gc'
+-- external
 require 'raylib'
-
+-- our modules
 local Automatas = require 'automatas'
 require 'helpers'
+
+##[[
+  if PLATFORM_WEB then
+    cflags '-O3 -Wall'
+    cflags './raylib/src/libraylib.a -I./raylib/src/  -L./raylib/src/'
+    cflags '-s USE_GLFW=3 -DPLATFORM_WEB -s WASM=1 -s USE_WEBGL2=1'
+  end
+]]
+
+## if PLATFORM_WEB then
+  collectgarbage('stop') -- conservative GCs cannot run automatically with emscripten
+## end
+
+## if not PLATFORM_WEB then
+  -- Enable VSYNC if we're building for Desktop
+  rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
+## end
 
 local TARGET_FPS: integer <comptime> = 60
 local SCREEN_WIDTH: integer <comptime> = 1280
@@ -79,8 +99,6 @@ local function UpdateGrid()
   grid = tmp_grid
 end
 
---- [[ Game loop ]] ---
-
 rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Game of life - Nelua")
 rl.clearBackground(automata.states[0].color)
 
@@ -89,7 +107,7 @@ rl.setExitKey(rl.keyboardKey.ESCAPE)
 rl.setExitKey(rl.keyboardKey.CAPS_LOCK)
 rl.setExitKey(rl.keyboardKey.Q)
 
-while not rl.windowShouldClose() do
+local function GameLoop()
   --- grab key events
   do
     if rl.isKeyPressed(rl.keyboardKey.C) then
@@ -252,6 +270,21 @@ KEYS:
 
     rl.endDrawing()
   end
+
+  ## if PLATFORM_WEB then
+    collectgarbage() -- safe to collect garbage here
+  ## end
 end
+
+## if PLATFORM_WEB then
+  -- If building for web, pass wasmSetMainLoop which calls emscripten_set_main_loop. Don't use if you're passing ASYNCIFY flag!
+  rl.wasmSetMainLoop(GameLoop, 0, 1)
+## else
+
+  while not rl.windowShouldClose() do
+    GameLoop()
+  end
+
+##end
 
 rl.closeWindow()
