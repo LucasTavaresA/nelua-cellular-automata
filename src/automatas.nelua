@@ -1,0 +1,91 @@
+require 'raylib'
+local DARKRED: rl.color = rl.color{ 128, 0, 0, 255 }
+
+local Automata = @record{
+  name: string,
+  -- HACK(LucasTA): Since some automatas have only 2 states
+  --                maybe i should use some dynamic data structure here
+  states: [3]record{
+    color: rl.color,
+    normal: integer,
+    transitions: hashmap(integer, integer)
+  },
+  explored: rl.color,
+}
+
+local GOL = Automata{
+  "Game of Life",
+  {
+    { rl.BLUE },
+    { rl.SKYBLUE },
+  },
+  rl.DARKBLUE,
+}
+
+GOL.states[0].transitions[3] = 1
+GOL.states[1].transitions[2] = 1
+GOL.states[1].transitions[3] = 1
+
+local Seeds = Automata{
+  "Seeds",
+  {
+    { rl.LIME },
+    { rl.GREEN },
+  },
+  rl.DARKGREEN,
+}
+
+Seeds.states[0].transitions[2] = 1
+
+local BriansBrain = Automata{
+  "Brian's Brain",
+  {
+    { rl.BLACK },
+    { rl.YELLOW, 2 },
+    { rl.RED },
+  },
+  DARKRED,
+}
+
+BriansBrain.states[0].transitions[2] = 1
+
+-- seems simpler to derive all other mazes from it so its declared first
+local Mazectric = Automata{
+  "Mazectric",
+  {
+    { rl.WHITE },
+    { rl.BLACK },
+  },
+  rl.LIGHTGRAY,
+}
+
+Mazectric.states[0].transitions[3] = 1
+Mazectric.states[1].transitions[1] = 1
+Mazectric.states[1].transitions[2] = 1
+Mazectric.states[1].transitions[3] = 1
+Mazectric.states[1].transitions[4] = 1
+
+local Maze = Mazectric
+Maze.name = "Maze"
+Maze.states[1].transitions[5] = 1
+
+local MazectricMice = Mazectric
+MazectricMice.name = "Mazectric with mice"
+MazectricMice.states[0].transitions[7] = 1
+
+local MazeMice = Maze
+MazeMice.name = "Maze with mice"
+MazeMice.states[0].transitions[7] = 1
+
+local automatas: []Automata =
+{
+  GOL,
+  Seeds,
+  BriansBrain,
+  Maze,
+  Mazectric,
+  MazeMice,
+  MazectricMice,
+}
+
+return automatas

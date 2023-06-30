@@ -1,0 +1,257 @@
+require 'raylib'
+
+local Automatas = require 'automatas'
+require 'helpers'
+
+local TARGET_FPS: integer <comptime> = 60
+local SCREEN_WIDTH: integer <comptime> = 1280
+local SCREEN_HEIGHT: integer <comptime> = 720
+local SCREEN_PADDING: integer <comptime> = 20
+local FONTSIZE: integer <comptime> = 20
+local UPDATE_TIME: number <comptime> = 0.2
+
+local paused = true
+local elapsed_time: number = 0
+local automata_index = 0
+local automata = Automatas[automata_index]
+
+local cell_width: integer <comptime> = 16
+local cell_height: integer <comptime> = 16
+local rows: integer <comptime> = SCREEN_HEIGHT / cell_height
+local cols: integer <comptime> = SCREEN_WIDTH / cell_width
+local grid: [rows][cols]integer
+local tmp_grid: [rows][cols]integer <noinit>
+local explored_grid: [rows][cols]boolean <noinit>
+local exploring: boolean = false
+
+local draw_debug: boolean <noinit>
+local debug_text: string <noinit>
+local draw_help: boolean <noinit>
+local help_text: string <noinit>
+
+local mouse_hover_color: rl.color <noinit>
+local mouse_x: integer <noinit>
+local mouse_y: integer <noinit>
+local mouse_gridIndexX: integer <noinit>
+local mouse_gridIndexY: integer <noinit>
+local mouse_gridX: integer <noinit>
+local mouse_gridY: integer <noinit>
+
+local function CountNeighbors(row: integer, col: integer)
+  local count = 0
+
+  for i = -1, 1 do
+    for j = -1, 1 do
+      if i ~= 0 or j ~= 0 then
+        local r = (row + i % rows + rows) % rows
+        local c = (col + j % cols + cols) % cols
+
+        if grid[r][c] == 1 then
+          count = count + 1
+        end
+      end
+    end
+  end
+
+  return count
+end
+
+local function UpdateGrid()
+  tmp_grid = grid
+
+  for r = 0, <rows do
+    for c = 0, <cols do
+      local neighbors = CountNeighbors(r, c)
+      local ok, state = automata.states[grid[r][c]].transitions:has_and_get(neighbors)
+
+      if ok then
+        if state == 1 then
+          explored_grid[r][c] = true
+        end
+
+        tmp_grid[r][c] = state
+      else
+        tmp_grid[r][c] = automata.states[grid[r][c]].normal
+      end
+    end
+  end
+
+  grid = tmp_grid
+end
+
+--- [[ Game loop ]] ---
+
+rl.initWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Game of life - Nelua")
+rl.clearBackground(automata.states[0].color)
+
+rl.setTargetFPS(TARGET_FPS)
+rl.setExitKey(rl.keyboardKey.ESCAPE)
+rl.setExitKey(rl.keyboardKey.CAPS_LOCK)
+rl.setExitKey(rl.keyboardKey.Q)
+
+while not rl.windowShouldClose() do
+  --- grab key events
+  do
+    if rl.isKeyPressed(rl.keyboardKey.C) then
+      automata_index = (automata_index + 1) % #Automatas
+      automata = Automatas[automata_index]
+    end
+
+    if rl.isKeyPressed(rl.keyboardKey.SPACE) then
+      if paused then
+        paused = false
+      else
+        paused = true
+      end
+    end
+
+    if rl.isKeyPressed(rl.keyboardKey.R) then
+      grid = (@[rows][cols]integer){}
+      explored_grid = (@[rows][cols]boolean){}
+    end
+
+    if rl.isKeyPressed(rl.keyboardKey.D) then
+      if draw_debug then
+        draw_debug = false
+      else
+        draw_debug = true
+      end
+    end
+
+    if rl.isKeyPressed(rl.keyboardKey.E) then
+      if exploring then
+        exploring = false
+      else
+        exploring = true
+      end
+    end
+
+    if
+      rl.isKeyPressed(rl.keyboardKey.H)
+      or rl.isKeyPressed(rl.keyboardKey.F1)
+    then
+      if draw_help then
+        draw_help = false
+      else
+        draw_help = true
+      end
+    end
+
+    if not paused then
+      elapsed_time = elapsed_time + rl.getFrameTime()
+    end
+  end
+
+  --- grab mouse events
+  do
+    mouse_x = rl.getMouseX()
+    mouse_y = rl.getMouseY()
+    mouse_gridIndexX = mouse_x // cell_width
+    mouse_gridIndexY = mouse_y // cell_height
+    mouse_gridX = mouse_gridIndexX * cell_width
+    mouse_gridY = mouse_gridIndexY * cell_height
+    mouse_hover_color = InvertColor(automata.states[grid[mouse_gridIndexY][mouse_gridIndexX]].color)
+  end
+
+  --- update the grid
+  do
+    if rl.isMouseButtonDown(rl.mouseButton.LEFT_BUTTON) then
+      grid[mouse_gridIndexY][mouse_gridIndexX] = 1
+    end
+
+    -- don't update the grid here its too fast
+    -- let the bottom if statement check its multiplied UPDATE_TIME
+    if
+      (rl.isKeyDown(rl.keyboardKey.LEFT_SHIFT) or rl.isKeyDown(rl.keyboardKey.RIGHT_SHIFT))
+        and rl.isKeyDown(rl.keyboardKey.S)
+    then
+      elapsed_time = elapsed_time + rl.getFrameTime() * 4
+    end
+
+    if rl.isKeyPressed(rl.keyboardKey.S) then
+      UpdateGrid()
+    elseif elapsed_time >= UPDATE_TIME then
+      UpdateGrid()
+      elapsed_time = 0
+    end
+  end
+
+  --- draw everything
+  do
+    rl.beginDrawing()
+    rl.clearBackground(automata.states[0].color)
+
+    --- grid
+    for r = 0, <rows do
+      for c = 0, <cols do
+        rl.drawRectangle(cell_width * c, cell_height * r,
+                         cell_width, cell_height,
+                         automata.states[grid[r][c]].color)
+
+        if exploring and grid[r][c] == 0 and explored_grid[r][c] == true then
+          rl.drawRectangle(cell_width * c, cell_height * r,
+                           cell_width, cell_height,
+                           automata.explored)
+        end
+      end
+    end
+
+    --- current cell selection
+    rl.drawRectangleLines(mouse_gridX, mouse_gridY, cell_width, cell_height, mouse_hover_color)
+
+    --- text
+    do
+      if draw_debug then
+        debug_text = string.format([[
+
+FPS: %s
+SCREEN_SIZE: %sx%s
+rows/cols: %s/%s
+
+Mouse:
+  x %s
+  y %s
+  gridX %s
+  gridY %s
+  gridIndexX %s
+  gridIndexY %s
+]], rl.getFPS(), SCREEN_WIDTH, SCREEN_HEIGHT, rows, cols,
+mouse_x, mouse_y, mouse_gridX, mouse_gridY, mouse_gridIndexX, mouse_gridIndexY)
+      else
+        debug_text = ""
+      end
+
+      if draw_help then
+        help_text = [[
+KEYS:
+  <q/esc>   close
+  <r>       reset the cells
+  <Space>   pause/unpause
+  <Shift-S> fast forward
+  <s>       advance a step
+  <c>       switch automata
+  <d>       toggle debug info
+  <e>       toggle explored area
+  <h/f1>    toggle keys info
+]]
+      else
+        help_text = "<h/f1> keys"
+      end
+
+      DrawTextBox(SCREEN_PADDING, SCREEN_PADDING, SCREEN_PADDING,
+                  help_text .. debug_text, FONTSIZE,
+                  automata.states[1].color, automata.states[0].color)
+
+      DrawTextBox(
+        (SCREEN_WIDTH - rl.measureText(automata.name, FONTSIZE)) / 2,
+        SCREEN_PADDING, SCREEN_PADDING,
+        automata.name, FONTSIZE,
+        automata.states[1].color, automata.states[0].color
+      )
+    end
+
+    rl.endDrawing()
+  end
+end
+
+rl.closeWindow()
