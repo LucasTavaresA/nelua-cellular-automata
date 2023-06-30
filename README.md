@@ -4,6 +4,8 @@ Interactive, generalized [cellular automata](https://en.wikipedia.org/wiki/Cellu
 
 [Play it!](https://lucastavaresa.github.io/nelua-cellular-automata/dist/index.html), It works in the browser!
 
+[Failed to open webgl context](#failed-to-open-webgl-context)
+
 ## Game of Life
 
 ![GOL](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/889cb019-dd2e-466f-929e-d20ce9831319)
@@ -29,3 +31,11 @@ There is also versions with mice which are cells that "walk" in the maze
 This guy did the actual hard work
 
 - [Kenta](https://github.com/Its-Kenta) - Maintainer of the [Raylib.Nelua](https://github.com/Its-Kenta/Raylib.nelua) bindings
+
+## Failed to open webgl context
+
+**might fail to execute on old computers try executing this** switch firefox for your browser of choice
+
+`LIBGL_ALWAYS_SOFTWARE=1 firefox https://lucastavaresa.github.io/nelua-cellular-automata/dist/index.html`
+
+On firefox specifically also try enabling 'webgl.force' on [about:config](about:config)
