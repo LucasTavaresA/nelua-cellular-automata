@@ -6,21 +6,23 @@ Interactive, generalized [cellular automata](https://en.wikipedia.org/wiki/Cellu
 
 ## Game of Life
 
-![desc](./images/image.jpg)[]
+![GOL](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/889cb019-dd2e-466f-929e-d20ce9831319)
 
 ## Seeds
 
-![desc](./images/image.jpg)[]
+![Seeds](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/5809dbd3-2856-4833-802b-430a99b132a3)
 
 ## Brian's Brain
 
-![desc](./images/image.jpg)[]
+![BriansBrain](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/ec0dac7c-0826-4b11-bef3-f18c21597d8c)
 
 ## Maze / Mazectric
 
-With or without mice
+Mazectrc has longer and cooler corridors
 
-![desc](./images/image.jpg)[]
+There is also versions with mice which are cells that "walk" in the maze
+
+![Maze](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/52760925-3349-48d9-a340-655979317f91)
 
 ## Credits
 
