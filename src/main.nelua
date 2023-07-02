@@ -41,8 +41,8 @@ local rows: integer <comptime> = SCREEN_HEIGHT / cell_height
 local cols: integer <comptime> = SCREEN_WIDTH / cell_width
 local grid: [rows][cols]integer
 local tmp_grid: [rows][cols]integer <noinit>
-local explored_grid: [rows][cols]boolean <noinit>
-local exploring: boolean = false
+local explored_grid: [rows][cols]boolean
+local exploring = false
 
 local draw_debug: boolean <noinit>
 local debug_text: string <noinit>
@@ -63,8 +63,8 @@ local function CountNeighbors(row: integer, col: integer)
   for i = -1, 1 do
     for j = -1, 1 do
       if i ~= 0 or j ~= 0 then
-        local r = (row + i % rows + rows) % rows
-        local c = (col + j % cols + cols) % cols
+        local r = (row + (i % rows) + rows) % rows
+        local c = (col + (j % cols) + cols) % cols
 
         if grid[r][c] == 1 then
           count = count + 1
@@ -116,11 +116,7 @@ local function GameLoop()
     end
 
     if rl.isKeyPressed(rl.keyboardKey.SPACE) then
-      if paused then
-        paused = false
-      else
-        paused = true
-      end
+      paused = not paused
     end
 
     if rl.isKeyPressed(rl.keyboardKey.R) then
@@ -129,30 +125,18 @@ local function GameLoop()
     end
 
     if rl.isKeyPressed(rl.keyboardKey.D) then
-      if draw_debug then
-        draw_debug = false
-      else
-        draw_debug = true
-      end
+      draw_debug = not draw_debug
     end
 
     if rl.isKeyPressed(rl.keyboardKey.E) then
-      if exploring then
-        exploring = false
-      else
-        exploring = true
-      end
+      exploring = not exploring
     end
 
     if
       rl.isKeyPressed(rl.keyboardKey.H)
       or rl.isKeyPressed(rl.keyboardKey.F1)
     then
-      if draw_help then
-        draw_help = false
-      else
-        draw_help = true
-      end
+      draw_help = not draw_help
     end
 
     if not paused then
@@ -206,7 +190,7 @@ local function GameLoop()
                          cell_width, cell_height,
                          automata.states[grid[r][c]].color)
 
-        if exploring and grid[r][c] == 0 and explored_grid[r][c] == true then
+        if exploring and grid[r][c] == 0 and explored_grid[r][c] then
           rl.drawRectangle(cell_width * c, cell_height * r,
                            cell_width, cell_height,
                            automata.explored)
@@ -261,7 +245,7 @@ KEYS:
                   automata.states[1].color, automata.states[0].color)
 
       DrawTextBox(
-        (SCREEN_WIDTH - rl.measureText(automata.name, FONTSIZE)) / 2,
+        (SCREEN_WIDTH - (rl.measureText(automata.name, FONTSIZE) + SCREEN_PADDING)) / 2,
         SCREEN_PADDING, SCREEN_PADDING,
         automata.name, FONTSIZE,
         automata.states[1].color, automata.states[0].color

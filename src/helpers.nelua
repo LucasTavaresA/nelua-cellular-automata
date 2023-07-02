@@ -4,8 +4,8 @@ global function InvertColor(color: rl.color)
   return rl.color{ ~color.r, ~color.g, ~color.b, color.a }
 end
 
-global function DrawTextBox(x: cint, y: cint, inner_padding: cint,
-                           text: string, fontsize: cint,
+global function DrawTextBox(x: integer, y: integer, inner_padding: integer,
+                           text: string, fontsize: integer,
                            fg: rl.color, bg: rl.color)
   local textSize = rl.measureTextEx(rl.getFontDefault(), text, fontsize, 2)
   local width = textSize.x + (2 * inner_padding)
