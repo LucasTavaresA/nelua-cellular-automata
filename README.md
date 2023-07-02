@@ -18,13 +18,22 @@ Interactive, generalized [cellular automata](https://en.wikipedia.org/wiki/Cellu
 
 ![BriansBrain](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/ec0dac7c-0826-4b11-bef3-f18c21597d8c)
 
-## Maze / Mazectric
+## Mazes / Mazectric
 
-Mazectrc has longer and cooler corridors
+Mazectric has longer and cooler corridors
 
 There is also versions with mice which are cells that "walk" in the maze
 
 ![Maze](https://github.com/LucasTavaresA/nelua-cellular-automata/assets/80704612/52760925-3349-48d9-a340-655979317f91)
+
+## and more
+
+- HighLife
+- StarWars
+- Serviettes
+- IceBalls
+- Assimilation
+- Coral
 
 ## Credits
 

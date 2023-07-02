@@ -1,11 +1,13 @@
 require 'raylib'
-local DARKRED: rl.color = rl.color{ 128, 0, 0, 255 }
+local DARKRED = rl.color{ 128, 0, 0, 255 }
+local DARKPURPLE = rl.color{ 112, 31, 126, 255 }
+local LIGHTBLUE = rl.color{ 102, 163, 255, 255 }
 
 local Automata = @record{
   name: string,
   -- HACK(LucasTA): Since some automatas have only 2 states
   --                maybe i should use some dynamic data structure here
-  states: [3]record{
+  states: [4]record{
     color: rl.color,
     normal: integer,
     transitions: hashmap(integer, integer)
@@ -25,6 +27,20 @@ local GOL = Automata{
 GOL.states[0].transitions[3] = 1
 GOL.states[1].transitions[2] = 1
 GOL.states[1].transitions[3] = 1
+
+local HighLife = Automata{
+  "HighLife",
+  {
+    { DARKPURPLE },
+    { rl.PURPLE },
+  },
+  rl.VIOLET,
+}
+
+HighLife.states[0].transitions[3] = 1
+HighLife.states[0].transitions[6] = 1
+HighLife.states[1].transitions[2] = 1
+HighLife.states[1].transitions[3] = 1
 
 local Seeds = Automata{
   "Seeds",
@@ -48,6 +64,87 @@ local BriansBrain = Automata{
 }
 
 BriansBrain.states[0].transitions[2] = 1
+
+local StarWars = Automata{
+  "StarWars",
+  {
+    { rl.BLACK },
+    { rl.ORANGE, 2 },
+    { rl.YELLOW, 3 },
+    { rl.RED },
+  },
+  DARKRED,
+}
+
+StarWars.states[0].transitions[2] = 1
+StarWars.states[1].transitions[3] = 1
+StarWars.states[1].transitions[4] = 1
+StarWars.states[1].transitions[5] = 1
+
+local Serviettes = Automata{
+  "Serviettes",
+  {
+    { rl.SKYBLUE },
+    { rl.BLUE },
+  },
+  rl.DARKBLUE,
+}
+
+Serviettes.states[0].transitions[2] = 1
+Serviettes.states[0].transitions[3] = 1
+Serviettes.states[0].transitions[4] = 1
+
+local IceBalls = Automata{
+  "IceBalls",
+  {
+    { rl.SKYBLUE },
+    { rl.GRAY },
+  },
+  rl.LIGHTGRAY,
+}
+
+IceBalls.states[0].transitions[2] = 1
+IceBalls.states[0].transitions[5] = 1
+IceBalls.states[0].transitions[6] = 1
+IceBalls.states[0].transitions[7] = 1
+IceBalls.states[0].transitions[8] = 1
+IceBalls.states[1].transitions[5] = 1
+IceBalls.states[1].transitions[6] = 1
+IceBalls.states[1].transitions[7] = 1
+IceBalls.states[1].transitions[8] = 1
+
+local Assimilation = Automata{
+  "Assimilation",
+  {
+    { rl.WHITE },
+    { rl.BLACK },
+  },
+  rl.GRAY,
+}
+
+Assimilation.states[0].transitions[3] = 1
+Assimilation.states[0].transitions[4] = 1
+Assimilation.states[0].transitions[5] = 1
+Assimilation.states[1].transitions[4] = 1
+Assimilation.states[1].transitions[5] = 1
+Assimilation.states[1].transitions[6] = 1
+Assimilation.states[1].transitions[7] = 1
+
+local Coral = Automata{
+  "Coral",
+  {
+    { LIGHTBLUE },
+    { DARKPURPLE },
+  },
+  rl.SKYBLUE,
+}
+
+Coral.states[0].transitions[3] = 1
+Coral.states[1].transitions[4] = 1
+Coral.states[1].transitions[5] = 1
+Coral.states[1].transitions[6] = 1
+Coral.states[1].transitions[7] = 1
+Coral.states[1].transitions[8] = 1
 
 -- seems simpler to derive all other mazes from it so its declared first
 local Mazectric = Automata{
@@ -80,8 +177,14 @@ MazeMice.states[0].transitions[7] = 1
 local automatas: []Automata =
 {
   GOL,
+  HighLife,
   Seeds,
   BriansBrain,
+  StarWars,
+  Serviettes,
+  IceBalls,
+  Assimilation,
+  Coral,
   Maze,
   Mazectric,
   MazeMice,
