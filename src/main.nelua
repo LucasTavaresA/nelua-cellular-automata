@@ -18,11 +18,6 @@ require 'helpers'
   collectgarbage('stop') -- conservative GCs cannot run automatically with emscripten
 ## end
 
-## if not PLATFORM_WEB then
-  -- Enable VSYNC if we're building for Desktop
-  rl.setConfigFlags(rl.configFlags.VSYNC_HINT)
-## end
-
 local TARGET_FPS: integer <comptime> = 60
 local SCREEN_WIDTH: integer <comptime> = 1280
 local SCREEN_HEIGHT: integer <comptime> = 720
