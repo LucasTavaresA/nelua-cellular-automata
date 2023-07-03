@@ -26,7 +26,7 @@ require 'helpers'
 local TARGET_FPS: integer <comptime> = 60
 local SCREEN_WIDTH: integer <comptime> = 1280
 local SCREEN_HEIGHT: integer <comptime> = 720
-local SCREEN_PADDING: integer <comptime> = 20
+local PADDING: integer <comptime> = 10
 local FONTSIZE: integer <comptime> = 20
 local UPDATE_TIME: number <comptime> = 0.2
 
@@ -205,9 +205,7 @@ local function GameLoop()
     --- text
     do
       if draw_debug then
-        debug_text = string.format([[
-
-FPS: %s
+        debug_text = string.format([[FPS: %s
 SCREEN_SIZE: %sx%s
 rows/cols: %s/%s
 
@@ -217,16 +215,19 @@ Mouse:
   gridX %s
   gridY %s
   gridIndexX %s
-  gridIndexY %s
-]], rl.getFPS(), SCREEN_WIDTH, SCREEN_HEIGHT, rows, cols,
+  gridIndexY %s]], rl.getFPS(), SCREEN_WIDTH, SCREEN_HEIGHT, rows, cols,
 mouse_x, mouse_y, mouse_gridX, mouse_gridY, mouse_gridIndexX, mouse_gridIndexY)
-      else
-        debug_text = ""
+
+        DrawTextBox(
+          SCREEN_WIDTH - (rl.measureText(debug_text, FONTSIZE) + PADDING * 3),
+          PADDING, PADDING,
+          debug_text, FONTSIZE,
+          automata.states[1].color, automata.states[0].color
+        )
       end
 
       if draw_help then
-        help_text = [[
-KEYS:
+        help_text = [[KEYS:
   <q/esc>   close
   <r>       reset the cells
   <Space>   pause/unpause
@@ -235,19 +236,18 @@ KEYS:
   <c>       switch automata
   <d>       toggle debug info
   <e>       toggle explored area
-  <h/f1>    toggle keys info
-]]
+  <h/f1>    toggle keys info]]
       else
         help_text = "<h/f1> keys"
       end
 
-      DrawTextBox(SCREEN_PADDING, SCREEN_PADDING, SCREEN_PADDING,
-                  help_text .. debug_text, FONTSIZE,
+      DrawTextBox(PADDING, PADDING, PADDING,
+                  help_text, FONTSIZE,
                   automata.states[1].color, automata.states[0].color)
 
       DrawTextBox(
-        (SCREEN_WIDTH - (rl.measureText(automata.name, FONTSIZE) + SCREEN_PADDING)) / 2,
-        SCREEN_PADDING, SCREEN_PADDING,
+        (SCREEN_WIDTH - rl.measureText(automata.name, FONTSIZE)) / 2,
+        PADDING, PADDING,
         automata.name, FONTSIZE,
         automata.states[1].color, automata.states[0].color
       )
