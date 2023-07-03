@@ -1,17 +1,18 @@
 require 'raylib'
+
 local DARKRED = rl.color{ 128, 0, 0, 255 }
 local DARKPURPLE = rl.color{ 112, 31, 126, 255 }
 local LIGHTBLUE = rl.color{ 102, 163, 255, 255 }
 
+local State = @record{
+  color: rl.color,
+  normal: integer,
+  transitions: hashmap(integer, integer)
+}
+
 local Automata = @record{
   name: string,
-  -- HACK(LucasTA): Since some automatas have only 2 states
-  --                maybe i should use some dynamic data structure here
-  states: [4]record{
-    color: rl.color,
-    normal: integer,
-    transitions: hashmap(integer, integer)
-  },
+  states: vector(State),
   explored: rl.color,
 }
 

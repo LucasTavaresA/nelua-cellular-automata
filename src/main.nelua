@@ -77,6 +77,11 @@ local function UpdateGrid()
 
   for r = 0, <rows do
     for c = 0, <cols do
+      -- truncate state when switching to an automata with less states
+      if grid[r * cols + c] > #automata.states - 1 then
+        grid[r * cols + c] = #automata.states - 1
+      end
+
       local neighbors = CountNeighbors(r, c)
       local ok, state = automata.states[grid[r * cols + c]].transitions:has_and_get(neighbors)
 
@@ -182,6 +187,11 @@ local function GameLoop()
     --- grid
     for r = 0, <rows do
       for c = 0, <cols do
+        -- truncate state when switching to an automata with less states
+        if grid[r * cols + c] > #automata.states - 1 then
+          grid[r * cols + c] = #automata.states - 1
+        end
+
         rl.drawRectangle(cell_width * c, cell_height * r,
                          cell_width, cell_height,
                          automata.states[grid[r * cols + c]].color)
