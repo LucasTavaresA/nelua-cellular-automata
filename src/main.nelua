@@ -39,9 +39,10 @@ local cell_width: integer <comptime> = 16
 local cell_height: integer <comptime> = 16
 local rows: integer <comptime> = SCREEN_HEIGHT / cell_height
 local cols: integer <comptime> = SCREEN_WIDTH / cell_width
-local grid: [rows][cols]integer
-local tmp_grid: [rows][cols]integer <noinit>
-local explored_grid: [rows][cols]boolean
+local grid_length: integer <comptime> = rows * cols
+local grid: [grid_length]integer
+local explored_grid: [grid_length]boolean
+local tmp_grid: [grid_length]integer <noinit>
 local exploring = false
 
 local draw_debug: boolean <noinit>
@@ -66,7 +67,7 @@ local function CountNeighbors(row: integer, col: integer)
         local r = (row + (i % rows) + rows) % rows
         local c = (col + (j % cols) + cols) % cols
 
-        if grid[r][c] == 1 then
+        if grid[r * cols + c] == 1 then
           count = count + 1
         end
       end
@@ -82,16 +83,16 @@ local function UpdateGrid()
   for r = 0, <rows do
     for c = 0, <cols do
       local neighbors = CountNeighbors(r, c)
-      local ok, state = automata.states[grid[r][c]].transitions:has_and_get(neighbors)
+      local ok, state = automata.states[grid[r * cols + c]].transitions:has_and_get(neighbors)
 
       if ok then
         if state == 1 then
-          explored_grid[r][c] = true
+          explored_grid[r * cols + c] = true
         end
 
-        tmp_grid[r][c] = state
+        tmp_grid[r * cols + c] = state
       else
-        tmp_grid[r][c] = automata.states[grid[r][c]].normal
+        tmp_grid[r * cols + c] = automata.states[grid[r * cols + c]].normal
       end
     end
   end
@@ -120,8 +121,8 @@ local function GameLoop()
     end
 
     if rl.isKeyPressed(rl.keyboardKey.R) then
-      grid = (@[rows][cols]integer){}
-      explored_grid = (@[rows][cols]boolean){}
+      grid = (@[grid_length]integer){}
+      explored_grid = (@[grid_length]boolean){}
     end
 
     if rl.isKeyPressed(rl.keyboardKey.D) then
@@ -152,13 +153,13 @@ local function GameLoop()
     mouse_gridIndexY = mouse_y // cell_height
     mouse_gridX = mouse_gridIndexX * cell_width
     mouse_gridY = mouse_gridIndexY * cell_height
-    mouse_hover_color = InvertColor(automata.states[grid[mouse_gridIndexY][mouse_gridIndexX]].color)
+    mouse_hover_color = InvertColor(automata.states[grid[mouse_gridIndexY * cols + mouse_gridIndexX]].color)
   end
 
   --- update the grid
   do
     if rl.isMouseButtonDown(rl.mouseButton.LEFT_BUTTON) then
-      grid[mouse_gridIndexY][mouse_gridIndexX] = 1
+      grid[mouse_gridIndexY * cols + mouse_gridIndexX] = 1
     end
 
     -- don't update the grid here its too fast
@@ -188,9 +189,9 @@ local function GameLoop()
       for c = 0, <cols do
         rl.drawRectangle(cell_width * c, cell_height * r,
                          cell_width, cell_height,
-                         automata.states[grid[r][c]].color)
+                         automata.states[grid[r * cols + c]].color)
 
-        if exploring and grid[r][c] == 0 and explored_grid[r][c] then
+        if exploring and grid[r * cols + c] == 0 and explored_grid[r * cols + c] then
           rl.drawRectangle(cell_width * c, cell_height * r,
                            cell_width, cell_height,
                            automata.explored)
