@@ -30,8 +30,8 @@ local elapsed_time: number = 0
 local automata_index = 0
 local automata = Automatas[automata_index]
 
-local cell_width: integer <comptime> = 16
-local cell_height: integer <comptime> = 16
+local cell_width: integer <comptime> = 10
+local cell_height: integer <comptime> = 10
 local rows: integer <comptime> = SCREEN_HEIGHT / cell_height
 local cols: integer <comptime> = SCREEN_WIDTH / cell_width
 local grid_length: integer <comptime> = rows * cols
