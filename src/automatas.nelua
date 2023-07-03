@@ -1,3 +1,40 @@
+--[[
+
+So automatas are usually defined with only two states dead or alive
+
+Here we use a generalized multistate approach:
+
+Each Automata type has a states table with the expected states:
+
+[0] = dead
+[1] = alive
+[...] more
+
+To deal with neighborhood sizes a hashmap stores possible transitions for each state
+
+To make making tables easier `automata.state[...].normal` stores the default transition on that state
+and its used when `automata.states[state]:has_and_get(N)` fails to find
+a transition with N neighbors
+
+This allow following common rulestrings very easily
+
+Game of Life: 'b3/s23' or '23/3'
+
+Born with 3 neighbors:
+
+automata.states[0].transitions[3] = 1 <- alive
+
+Else normal state for states[0] is 0 or dead
+
+Survives with 2 or 3 neighbors:
+
+automata.states[1].transitions[2] = 1
+automata.states[1].transitions[3] = 1
+
+Else normal state for states[1] is 0 or dead
+
+]]
+
 require 'raylib'
 
 local DARKRED = rl.color{ 128, 0, 0, 255 }
